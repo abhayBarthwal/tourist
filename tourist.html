@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Tourists</title>
+		<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+				<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+					<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+					<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+					<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8fdUWKRJCVWGK7CX5SnTOo1QxuczZ8_A&v=3.exp&sensor=false&libraries=places"></script>
+				</head>
+				<body style='background-image: url("water-1018808_1920.jpg");'>
+					<div class="container-fluid">
+						<h1 style="text-align: center; padding-top: 50px">Search Your Travel Destinations</h1>
+						<div class="row" style="text-align: center;">
+							<div class="col-sm-12" style="padding-left: 20%; padding-right: 20%; padding-top: 50px">
+								<input id="search" class="form-control" type="text" placeholder="Search" aria-label="Search">
+									<br>
+										<button id="search_button" type="button" onClick="reply_click()" class="btn btn-success">Search</button>
+									</div>
+								</div>
+								<br>
+									<div class="row" id="restaurant"></div>
+									<div class="row" id="hotel"></div>
+									<div class="row" id="place"></div>
+								</div>
+								<script>
+            function init() {
+                var input = document.getElementById('search');
+                var options = {
+  				types: ['(cities)']
+ 			};
+                var autocomplete = new google.maps.places.Autocomplete(input, options);
+            }
+ 
+            google.maps.event.addDomListener(window, 'load', init);
+
+            function reply_click(){
+            	document.getElementById('hotel').innerHTML = ""
+            	document.getElementById('restaurant').innerHTML = ""
+            	document.getElementById('place').innerHTML = ""
+            	var place = document.getElementById('search').value
+            	var lat = ""
+            	var lng = ""
+
+            	fetch('https://maps.googleapis.com/maps/api/geocode/json?address='+ place +'&key=AIzaSyA8fdUWKRJCVWGK7CX5SnTOo1QxuczZ8_A')
+			  .then(response => {
+			    return response.json()
+			  })
+			  .then(data => {
+			    lat = data.results[0].geometry.location.lat;
+			    lng = data.results[0].geometry.location.lng;
+			    get_restaurant(lat, lng);
+			    get_hotel(lat, lng);
+			    get_shop(lat, lng);
+			    setTimeout(function() { check_noResult(); }, 2000);
+			  })
+			  .catch(err => {
+			  })
+			            	
+			        }
+
+			    function get_restaurant(lat, lng){
+
+			    	fetch('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='+ lat +','+ lng +'&radius=1500&type=restaurant&key=AIzaSyA8fdUWKRJCVWGK7CX5SnTOo1QxuczZ8_A')
+			  .then(response => {
+			    return response.json()
+			  })
+			  .then(data => {
+			  	document.getElementById('restaurant').innerHTML += '<div class="col-sm-12" style="text-align: center; padding-top:30px; padding-bottom:30px"><h2>Restaurant List</h2></div><br><br>'
+			    for(var i = 0; i < 6; i++){
+			    	var restaunt_list = document.getElementById('restaurant');
+			    restaunt_list.innerHTML += "<div class='col-sm-4' style='padding-left:10%;height: 432px;'><div class='card' style='width: 18rem;'><img style='width: 100%;height: 15vw;object-fit: cover;' class='card-img-top' src='https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&maxheight=200&photoreference="+data.results[i].photos[0].photo_reference+"&key=AIzaSyA8fdUWKRJCVWGK7CX5SnTOo1QxuczZ8_A' alt='Card image cap'><div class='card-body'><h5 class='card-title'>Name: "+data.results[i].name+"</h5><p class='card-text'>Location: "+ data.results[i].vicinity +"</p><p class='card-text'>Price Level: "+ data.results[i].price_level +"</p><p class='card-text'>Rating: "+ data.results[i].rating +"</p></div></div></div>"
+			    }
+			  })
+			  .catch(err => {
+			  })
+			    }
+
+			    function get_hotel(lat, lng){
+
+			    	fetch('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='+ lat +','+ lng +'&radius=1500&type=hotel&key=AIzaSyA8fdUWKRJCVWGK7CX5SnTOo1QxuczZ8_A')
+			  .then(response => {
+			    return response.json()
+			  })
+			  .then(data => {
+			  	document.getElementById('hotel').innerHTML += '<div class="col-sm-12" style="text-align: center; padding-top:30px; padding-bottom:30px"><h2>Hotel List</h2></div><br><br>'
+
+			    for(var i = 0; i < 6; i++){
+			    	var hotel_list = document.getElementById('hotel');
+			    hotel_list.innerHTML += "<div class='col-sm-4' style='padding-left:10%; height: 352px;'><div class='card' style='width: 18rem;maxwidth=60%;maxheight=60%'><img style='width: 100%;height: 15vw;object-fit: cover;' class='card-img-top' src='https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&maxheight=200&photoreference="+data.results[i].photos[0].photo_reference+"&key=AIzaSyA8fdUWKRJCVWGK7CX5SnTOo1QxuczZ8_A' alt='Card image cap'><div class='card-body'><h5 class='card-title'>Name: "+data.results[i].name+"</h5><p class='card-text'>Location: "+ data.results[i].vicinity +"</p><p class='card-text'>Rating: "+ data.results[i].rating +"</p></div></div></div>"
+			  	}
+			    
+			  })
+			  .catch(err => {
+			  })
+			    }
+
+			    function get_shop(lat, lng){
+			    	fetch('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='+ lat +','+ lng +'&radius=1500&type=shopping_mall&key=AIzaSyA8fdUWKRJCVWGK7CX5SnTOo1QxuczZ8_A')
+			  .then(response => {
+			    return response.json()
+			  })
+			  .then(data => {
+			  	document.getElementById('place').innerHTML += '<div class="col-sm-12" style="text-align: center; padding-top:30px; padding-bottom:30px"><h2>Shopping mall List</h2></div><br><br>'
+
+			    for(var i = 0; i < 6; i++){
+			    	var shop_list = document.getElementById('place');
+			    shop_list.innerHTML += "<div class='col-sm-4' style='padding-left:10%; height: 352px;'><div class='card' style='width: 18rem;'><img style='width: 100%;height: 15vw;object-fit: cover;' class='card-img-top' src='https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&maxheight=200&photoreference="+data.results[i].photos[0].photo_reference+"&key=AIzaSyA8fdUWKRJCVWGK7CX5SnTOo1QxuczZ8_A' alt='Card image cap'><div class='card-body'><h5 class='card-title'>Name: "+data.results[i].name+"</h5><p class='card-text'>Location: "+ data.results[i].vicinity +"</p><p class='card-text'>Rating: "+ data.results[i].rating +"</p></div></div></div>"
+			  	}
+			    
+			  })
+			  .catch(err => {
+			  })
+			    }
+
+			    function check_noResult(){
+			    	if (document.getElementById('place').children.length == 3){
+			    		document.getElementById('place').innerHTML = "<div class='col-sm-12' style='padding-left:30%; height: 10px;'>No Shoppinag mall found in the selected destination</div><br>"
+			    	}
+			    	if (document.getElementById('restaurant').children.length == 3){
+			    		document.getElementById('restaurant').innerHTML = "<div class='col-sm-12' style='padding-left:30%; height: 10px;'>No Restaurant found in the selected destination</div><br>"
+			    	}
+			    	if (document.getElementById('hotel').children.length == 3){
+			    		document.getElementById('hotel').innerHTML = "<div class='col-sm-12' style='padding-left:30%; height:10px;'>No Hotel found in the selected destination</div><br>"
+			    	}
+			    }
+        
+			</script>
+		</body>
+	</html>
