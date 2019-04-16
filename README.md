@@ -3,3 +3,4 @@ set checklist.
 It uses google place api and library to autofill city, find latitude and longitude, get list of places and respective images.
 Its a Javascript based project with multiple API calls.
 Its responsive to any screensize.
+use you google place api key
